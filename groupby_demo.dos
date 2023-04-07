@@ -1,0 +1,21 @@
+sensors = loadTable("dfs://svmDemo","sensors")
+
+// 查看sensors表的表结构
+sensors.schema().colDefs
+
+// 查询指定1小时内CPU平均利用率最高的三台设备。假设CPU利用率为指标1。这里使用嵌套查询，先分组计算平均值，然后根据平均值排序，再对结果使用 top 子句（或 limit 子句）
+select top 3 id 
+from (
+	select avg(value) as avg
+	from sensors 
+	where mod(id, 50)=1, datetime between 2020.09.01T00:00:00 : 2020.09.01T00:59:59  
+	group by id order by avg desc
+)
+
+select id 
+from (
+	select avg(value) as avg
+	from sensors 
+	where mod(id, 50)=1, datetime between 2020.09.01T00:00:00 : 2020.09.01T00:59:59  
+	group by id order by avg desc
+) limit 3
