@@ -3,7 +3,17 @@ sensors = loadTable("dfs://svmDemo","sensors")
 // 查看sensors表的表结构
 sensors.schema().colDefs
 
+
+// group by 关键字会自动加入到结果集中，用户可以不在select语句中指定该列。生成的表的顺序为：group by中select未指定的字段排列在前，select指定的字段排列在后
+select count(*) from sensors group by id
+select count(*) as count, avg(value) as avg from sensors group by id
+
+// order by 根据order by指定的列，对结果排序；asc | desc 指定按升序或降序对数据进行排序。若不指定，则默认为升序。
+select top 5 * from sensors order by datetime
+select top 5 * from sensors order by datetime desc
+
 // 查询指定1小时内CPU平均利用率最高的三台设备。假设CPU利用率为指标1。这里使用嵌套查询，先分组计算平均值，然后根据平均值排序，再对结果使用 top 子句（或 limit 子句）
+// top 子句返回指定数量的记录，从表的第一个记录开始，可以在 top 子句中使用一个标量值或一个范围。范围下标从 0 开始而不是 1，并且不包含结束下标值。
 select top 3 id 
 from (
 	select avg(value) as avg
@@ -11,7 +21,7 @@ from (
 	where mod(id, 50)=1, datetime between 2020.09.01T00:00:00 : 2020.09.01T00:59:59  
 	group by id order by avg desc
 )
-
+// limit 子句可使用整型标量或代表整型标量的变量，以限制返回记录的数量，亦可与context by子句一同使用，以限制结果中每组记录的数量。
 select id 
 from (
 	select avg(value) as avg
@@ -19,3 +29,7 @@ from (
 	where mod(id, 50)=1, datetime between 2020.09.01T00:00:00 : 2020.09.01T00:59:59  
 	group by id order by avg desc
 ) limit 3
+
+// limit子句和top子句功能类似。两者的区别在于：
+// top子句中的整型常量不能为负数。在与context by子句一同使用时，limit子句标量值可以为负整数，返回每个组最后指定数目的记录。其他情况limit子句标量值为非负整数。
+// 可使用limit子句从某行开始选择一定数量的行。
