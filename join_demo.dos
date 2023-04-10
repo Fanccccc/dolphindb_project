@@ -46,3 +46,8 @@ wj(t1, t2, -5000:0, <[avg(value),max(value),min(value)]>, `id`datetime)
 
 // ***** left join ***** //
 // left join(lj) 关联查询兼容标准 SQL
+
+getStreamingStat()
+select count(*) from orderTable
+select count(*) from traitTable
+select count(*) from predictTable
